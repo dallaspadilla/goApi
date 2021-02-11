@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: goApidb
+    image: postgres
+    hostname: db
+    environment:
+      GET_HOST_FROM: dns
+      POSTGRES_USER: dallas
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    networks:
+      - goApinet
+  goApi:
+    container_name: goApi
+    image: dallase.padilla/goApi:v1
+    hostname: goApi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GET_HOSTS_FROM: dns
+    networks:
+      - goApinet
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    links:
+      - db
+    labels:
+      kompose.service.type: LoadBalancer
+networks:
+  goApinet:
+    driver: bridge
